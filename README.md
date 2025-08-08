@@ -1,6 +1,7 @@
 # Data Integration ETL Project
 
 This project performs an ETL (Extract, Transform, Load) process on student data from a CSV file and loads it into a SQL Server database.
+* Used Docker to create remote SQL database. Python virtual machine was used to run on remote database
 
 ## Features
 
