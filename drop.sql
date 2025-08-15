@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS student_services;
+DROP TABLE IF EXISTS students;
+DROP TABLE IF EXISTS services;

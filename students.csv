@@ -1,16 +1,16 @@
-student_id,full_name,dob,grade_level,service_code
-1001,Jane Doe,2010-05-12,5,SP01
-1002,John Smith,2011-08-20,4,SP03
-1003,Amy Chan,2009-02-17,6,SP02
-1004,Michael Johnson,2010-11-03,5,
-1005,Sophia Brown,2011-01-10,4,SP01
-1006,Elijah Moore,2008-03-22,7,SP04
-1007,Mia Hernandez,2009-09-15,6,SP02
-1008,Liam Nguyen,2010-06-11,5,SP05
-1009,Olivia Patel,2012-12-30,3,SP06
-1010,Noah Williams,2007-07-19,8,
-1011,Evelyn Garcia,2011-04-03,4,SP01
-1012,Lucas Kim,2008-11-25,7,SP07
-1013,Isabella Lopez,2012-05-05,3,SP01
-1014,Aiden Brooks,2009-10-18,6,SP08
-1015,Charlotte Rivera,2010-02-28,5,SP02
+student_id,first_name,last_name,dob,grade_level,service_code
+1001,Jane,Doe,2010-05-12,5,SP01
+1002,John,Smith,2011-08-20,4,SP03
+1003,Amy,Chan,2009-02-17,6,SP02
+1004,Michael,Johnson,2010-11-03,5,
+1005,Sophia,Brown,2011-01-10,4,SP01
+1006,Elijah,Moore,2008-03-22,7,SP04
+1007,Mia,Hernandez,2009-09-15,6,SP02
+1008,Liam,Nguyen,2010-06-11,5,SP05
+1009,Olivia,Patel,2012-12-30,3,SP06
+1010,Noah,Williams,2007-07-19,8,
+1011,Evelyn,Garcia,2011-04-03,4,SP01
+1012,Lucas,Kim,2008-11-25,7,SP07
+1013,Isabella,Lopez,2012-05-05,3,SP01
+1014,Aiden,Brooks,2009-10-18,6,SP08
+1015,Charlotte,Rivera,2010-02-28,5,SP02

@@ -1,75 +1,74 @@
-import pandas as pd
 import pyodbc
-import numpy as np
+import csv
 
-# Connection string to connect to SQL Server
+# === SQL Server connection ===
 conn_str = (
     "DRIVER={ODBC Driver 17 for SQL Server};"
-    "SERVER=localhost,1433;"
-    "DATABASE=master;"
+    "SERVER=localhost,1433;"  # replace with your Docker SQL Server name if needed
+    "DATABASE=student_db;"
     "UID=sa;"
-    "PWD=MyPassword123!"
+    "PWD=MyPassword123!;"  # replace with your SA password
 )
-
-# Connect to master to create the database if it doesn't exist
-print("Connecting to SQL Server (master)...")
 conn = pyodbc.connect(conn_str, autocommit=True)
 cursor = conn.cursor()
-cursor.execute("IF DB_ID('student_db') IS NULL CREATE DATABASE student_db")
-print("Database 'student_db' is ready.")
-cursor.close()
-conn.close()
 
-# Reconnect to student_db
-print("Connecting to 'student_db'...")
-conn_str_db = conn_str.replace("DATABASE=master", "DATABASE=student_db")
-conn = pyodbc.connect(conn_str_db)
-cursor = conn.cursor()
-
-# Drop existing table to avoid schema mismatch
-cursor.execute("IF OBJECT_ID('students', 'U') IS NOT NULL DROP TABLE students")
-
-# Create table with correct schema
+# === Create 'services' table if it doesn't exist ===
 cursor.execute("""
-    CREATE TABLE students (
-        student_id INT PRIMARY KEY,
-        full_name NVARCHAR(100),
-        dob DATE,
-        grade_level INT NULL,
-        service_code NVARCHAR(10) NULL
-    )
+IF OBJECT_ID('services', 'U') IS NULL
+CREATE TABLE services (
+    service_code VARCHAR(10) PRIMARY KEY,
+    service_name VARCHAR(100)
+)
+""")
+print("Table 'services' is ready.")
+
+# === Load services.csv ===
+print("Loading services data...")
+with open('services.csv', 'r') as csvfile:
+    reader = csv.DictReader(csvfile)
+    for row in reader:
+        cursor.execute("""
+        IF NOT EXISTS (SELECT 1 FROM services WHERE service_code = ?)
+        INSERT INTO services (service_code, service_name)
+        VALUES (?, ?)
+        """, row['service_code'], row['service_code'], row['service_name'])
+print("✅ Services data loaded.")
+
+# === Create 'students' table if it doesn't exist ===
+cursor.execute("""
+IF OBJECT_ID('students', 'U') IS NULL
+CREATE TABLE students (
+    student_id INT PRIMARY KEY,
+    first_name NVARCHAR(50),
+    last_name NVARCHAR(50),
+    dob DATE,
+    grade_level INT NULL,
+    service_code VARCHAR(10) NULL,
+    FOREIGN KEY (service_code) REFERENCES services(service_code)
+)
 """)
 print("Table 'students' is ready.")
 
-# Load data from CSV
-print("Loading data from CSV...")
-df = pd.read_csv("students.csv")
+# === Load students.csv ===
+print("Loading students data...")
+with open('students.csv', 'r') as csvfile:
+    reader = csv.DictReader(csvfile)
+    for row in reader:
+        cursor.execute("""
+        IF NOT EXISTS (SELECT 1 FROM students WHERE student_id = ?)
+        INSERT INTO students (student_id, first_name, last_name, dob, grade_level, service_code)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """,
+        row['student_id'],
+        row['student_id'],
+        row['first_name'],
+        row['last_name'],
+        row['dob'],
+        row['grade_level'],
+        row['service_code'] if row['service_code'] else None)
+print("✅ Students data loaded.")
 
-# Clean and format data
-df.replace({np.nan: None, "": None}, inplace=True)  # Replace NaN and blank with None
-df['grade_level'] = pd.to_numeric(df['grade_level'], errors='coerce').astype("Int64")  # Coerce invalid to NA
-df['dob'] = pd.to_datetime(df['dob'], errors='coerce').dt.date  # Convert to date
-
-# Insert data
-print("Inserting data...")
-insert_query = """
-    INSERT INTO students (student_id, full_name, dob, grade_level, service_code)
-    VALUES (?, ?, ?, ?, ?)
-"""
-
-for _, row in df.iterrows():
-    try:
-        cursor.execute(insert_query,
-                       row['student_id'],
-                       row['full_name'],
-                       row['dob'],
-                       row['grade_level'],
-                       row['service_code'])
-    except pyodbc.IntegrityError:
-        print(f"⚠️ Skipping duplicate student_id: {row['student_id']}")
-
-conn.commit()
-print("✅ ETL process completed successfully!")
-
+# === Close connection ===
 cursor.close()
 conn.close()
+print("ETL finished successfully.")
