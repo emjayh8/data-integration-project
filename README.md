@@ -69,9 +69,48 @@ Supports many-to-many relationships between students and services, with optional
 
 ## Querying and Reporting
 
-- Use the provided `test.sql` script to run example queries:
-  - Create a summary view of students per service and grade level
-  - List all students and their services
-  - Count services per student
-  - Count students per service
-  - Use the summary view for grade-level reporting
+The `test.sql` script provides several useful queries:
+
+1. **Create or update the summary view**
+   ```sql
+   CREATE OR ALTER VIEW student_services_summary AS
+   SELECT s.grade_level, sv.service_name, COUNT(*) AS num_students
+   FROM students AS s
+   JOIN services AS sv ON s.service_code = sv.service_code
+   GROUP BY s.grade_level, sv.service_name;
+   ```
+   *Creates a view that summarizes the number of students per grade level for each service.*
+
+2. **View all students and their services**
+   ```sql
+   SELECT s.student_id, s.first_name, s.last_name, sv.service_name
+   FROM students AS s
+   JOIN services AS sv ON s.service_code = sv.service_code
+   ORDER BY s.student_id;
+   ```
+   *Lists every student along with the name of the service they are linked to.*
+
+3. **Count services per student**
+   ```sql
+   SELECT s.student_id, s.first_name, s.last_name,
+          CASE WHEN s.service_code IS NULL THEN 0 ELSE 1 END AS total_services
+   FROM students AS s
+   ORDER BY total_services DESC;
+   ```
+   *Shows how many services each student is linked to (0 or 1 in this model).*
+
+4. **Count students per service (all grades)**
+   ```sql
+   SELECT sv.service_name, COUNT(*) AS num_students
+   FROM students AS s
+   JOIN services AS sv ON s.service_code = sv.service_code
+   GROUP BY sv.service_name
+   ORDER BY num_students DESC;
+   ```
+   *Counts the number of students assigned to each service, across all grade levels.*
+
+5. **Use the view for grade-level summary**
+   ```sql
+   SELECT * FROM student_services_summary ORDER BY grade_level, service_name;
+   ```
+   *Retrieves the summary of students per grade level and service from the view.*
