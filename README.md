@@ -5,26 +5,6 @@ This project demonstrates a full data integration workflow, including data inges
 
 The dataset consists of student information and special education services, which are transformed and loaded into a SQL Server database (student_db) for analysis.
 
-Folder Structure
-
-data-integration-project/
-│
-├── etl/
-│   ├── etl.py              # Extract, transform, load script
-│   ├── students.csv        # Source student data
-│   └── services.csv        # Source services data
-│
-├── sql/
-│   ├── setup.sql           # Database and table creation
-│   └── test.sql            # Queries, joins, views for analysis
-│
-├── dashboards/
-│   ├── dashboard.py        # Python visualization script
-│   └── dashboard.html      # Generated HTML dashboard
-│
-├── requirements.txt        # Python dependencies
-└── README.md
-
 Prerequisites
 - Python 3.10+
 - SQL Server running locally (Docker recommended)
