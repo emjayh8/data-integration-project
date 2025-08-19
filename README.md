@@ -1,116 +1,81 @@
-# Data Integration Project
+Data Integration Portfolio Project
 
-This project sets up a SQL Server database for managing student and service data, supporting ETL workflows and many-to-many relationships between students and services.
+Overview
+This project demonstrates a full data integration workflow, including data ingestion, transformation, validation, reporting, and visualization. The goal is to showcase skills in SQL Server, Python ETL, data analysis, and dashboard creation for a K-12 education dataset.
 
-## Features
+The dataset consists of student information and special education services, which are transformed and loaded into a SQL Server database (student_db) for analysis.
 
-- SQL scripts to drop and recreate tables for a clean setup
-- Three main tables for flexible data modeling
-- Foreign key constraints for data integrity
-- Example queries and a summary view for reporting
+Folder Structure
 
-## Requirements
+data-integration-project/
+│
+├── etl/
+│   ├── etl.py              # Extract, transform, load script
+│   ├── students.csv        # Source student data
+│   └── services.csv        # Source services data
+│
+├── sql/
+│   ├── setup.sql           # Database and table creation
+│   └── test.sql            # Queries, joins, views for analysis
+│
+├── dashboards/
+│   ├── dashboard.py        # Python visualization script
+│   └── dashboard.html      # Generated HTML dashboard
+│
+├── requirements.txt        # Python dependencies
+└── README.md
 
-- SQL Server (tested with ODBC Driver 17)
-- Python 3.x (for ETL scripts, if used)
-- `pyodbc` and `pandas` (for ETL scripts)
-- Access to the database `student_db`
+Prerequisites
+- Python 3.10+
+- SQL Server running locally (Docker recommended)
+- Python packages (listed in requirements.txt):
+  pandas
+  pyodbc
+  matplotlib
+  plotly
+- VS Code or another SQL client for running .sql scripts
 
-## Table Structure
+Setup Instructions
 
-### `services`
-Stores information about available services.
+1. Clone the repository
+   git clone https://github.com/yourusername/data-integration-project.git
+   cd data-integration-project
 
-| Column        | Type         | Description                  |
-|---------------|--------------|------------------------------|
-| service_code  | VARCHAR(10)  | Primary key, unique code     |
-| service_name  | VARCHAR(100) | Name of the service          |
+2. Set up Python virtual environment
+   python -m venv venv
+   source venv/bin/activate       # macOS/Linux
+   # or
+   venv\Scripts\activate          # Windows
+   pip install -r requirements.txt
 
-### `students`
-Stores student details and links each student to a service (optional).
+3. Set up SQL Server
+   - Run sql/setup.sql on your SQL Server instance to create student_db and tables.
 
-| Column        | Type         | Description                          |
-|---------------|--------------|--------------------------------------|
-| student_id    | INT          | Primary key, unique student ID       |
-| first_name    | VARCHAR(50)  | Student's first name                 |
-| last_name     | VARCHAR(50)  | Student's last name                  |
-| dob           | DATE         | Date of birth                        |
-| grade_level   | INT          | Grade level                          |
-| service_code  | VARCHAR(10)  | Foreign key to `services` (nullable) |
+4. Run ETL script
+   python etl/etl.py
+   - Loads students.csv and services.csv into the database
+   - Handles duplicate records and data validation
 
-### `student_services`
-Supports many-to-many relationships between students and services, with optional start and end dates.
+5. Run analysis queries
+   - Open sql/test.sql in your SQL client
+   - Execute queries to verify joins, aggregations, and views
 
-| Column             | Type         | Description                          |
-|--------------------|--------------|--------------------------------------|
-| student_service_id | INT          | Primary key, auto-increment          |
-| student_id         | INT          | Foreign key to `students`            |
-| service_code       | VARCHAR(10)  | Foreign key to `services`            |
-| start_date         | DATE         | Service start date (optional)        |
-| end_date           | DATE         | Service end date (optional)          |
+6. Generate dashboard
+   python dashboards/dashboard.py
+   - Creates dashboards/dashboard.html with visualizations of student services
 
-## Setup
+Features
 
-1. **Run the setup script:**
-   - Open SQL Server Management Studio, Azure Data Studio, or use `sqlcmd`.
-   - Execute `setup.sql` to drop existing tables and recreate them.
+- ETL Workflow: Reads CSVs, cleans data, loads into SQL Server
+- Data Integrity: Validates duplicates, enforces foreign key constraints
+- SQL Analysis: Aggregation queries, joins, and views
+- Visualization Dashboard: Automated charts for student-service distribution
+- Portfolio-ready: Organized folder structure and reproducible environment
 
-   ```sh
-   sqlcmd -S localhost,1433 -U sa -P YourPassword -i setup.sql
-   ```
+Notes
+- Designed for K-12 Special Education and Student Services data
+- Modular and reusable ETL and dashboard scripts
+- Easily extended with additional datasets or visualizations
 
-2. **(Optional) Run the ETL script:**
-   - Place your CSV files (`students.csv`, `services.csv`) in the project directory.
-   - Run the ETL Python script to load data.
-
-   ```sh
-   python etl.py
-   ```
-
-## Querying and Reporting
-
-The `test.sql` script provides several useful queries:
-
-1. **Create or update the summary view**
-   ```sql
-   CREATE OR ALTER VIEW student_services_summary AS
-   SELECT s.grade_level, sv.service_name, COUNT(*) AS num_students
-   FROM students AS s
-   JOIN services AS sv ON s.service_code = sv.service_code
-   GROUP BY s.grade_level, sv.service_name;
-   ```
-   *Creates a view that summarizes the number of students per grade level for each service.*
-
-2. **View all students and their services**
-   ```sql
-   SELECT s.student_id, s.first_name, s.last_name, sv.service_name
-   FROM students AS s
-   JOIN services AS sv ON s.service_code = sv.service_code
-   ORDER BY s.student_id;
-   ```
-   *Lists every student along with the name of the service they are linked to.*
-
-3. **Count services per student**
-   ```sql
-   SELECT s.student_id, s.first_name, s.last_name,
-          CASE WHEN s.service_code IS NULL THEN 0 ELSE 1 END AS total_services
-   FROM students AS s
-   ORDER BY total_services DESC;
-   ```
-   *Shows how many services each student is linked to (0 or 1 in this model).*
-
-4. **Count students per service (all grades)**
-   ```sql
-   SELECT sv.service_name, COUNT(*) AS num_students
-   FROM students AS s
-   JOIN services AS sv ON s.service_code = sv.service_code
-   GROUP BY sv.service_name
-   ORDER BY num_students DESC;
-   ```
-   *Counts the number of students assigned to each service, across all grade levels.*
-
-5. **Use the view for grade-level summary**
-   ```sql
-   SELECT * FROM student_services_summary ORDER BY grade_level, service_name;
-   ```
-   *Retrieves the summary of students per grade level and service from the view.*
+License
+MIT License
