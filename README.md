@@ -179,12 +179,5 @@ Supports many-to-many relationships between students and services, with optional
 
 ## Notes
 
-- Designed for K-12 Special Education and Student Services data
-- Modular and reusable ETL and dashboard scripts
-- Easily extended with additional datasets or visualizations
-
----
-
-## License
-
-MIT License
+- Update the connection strings in `etl.py` if your SQL Server uses different credentials.
+- The script is idempotent: it will not insert duplicate student records.
