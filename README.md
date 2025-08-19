@@ -177,6 +177,9 @@ Supports many-to-many relationships between students and services, with optional
 
 ---
 
+License
+MIT License
+
 ## Notes
 
 - Update the connection strings in `etl.py` if your SQL Server uses different credentials.
